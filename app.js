@@ -118,35 +118,23 @@ function string_int_add(str1, str2) {
 
 debugger;
 
-function quadratic(a, b) {
-	// var r_a = new BigInteger(a),
-		// r_b = new BigInteger(b);
-	return function(n) {
-		// var r_n = new BigInteger(n);
-		// return (r_n.pow(2)).add(r_a.multiply(n)).add(r_b);
-		return Math.pow(n, 2) + (n * a) + b;
+var results = [];
+
+for (var i = 2; i < 1000000; i++) {
+	var digits = i.toString().split("").map(function(digit){
+		return new BigInteger([parseInt(digit, 10)], 1);
+	});
+	if (i == digits.reduce(function(out, digit) {
+		return digit.pow(5).add(out);
+	}, BigInteger.ZERO).valueOf()) {
+		results.push(i);
 	}
 }
 
-var pairs = [];
-for (var a = -999; a < 1000; a++) {
-	for (var b = -999; b < 1000; b++) {
-		pairs.push({
-			a: a,
-			b: b,
-			n: 0
-			// fn: quadratic(a, b)
-		});
-	}
-}
-pairs.forEach(function(pair) {
-	var fn = quadratic(pair.a, pair.b);
-	var candidate = fn(pair.n);
-	while (candidate > 0 && candidate.valueOf().primeFactors().length === 0) {
-		candidate = fn(++pair.n);
-	}
+console.log("sum of all numbers which are themselves the sum of the digits ^ 5: %i", Math.sum(results));
+
+results.forEach(function(r) {
+	console.log.apply(console, 
+		["%i: %s^5 + %s^5 + %s^5 + %s^5 + %s^5", r].concat(r.toString().split(""))
+	);
 });
-var longest = pairs.reduce(function(out, pair) {
-	if (pair.n > out.n) return pair; else return out;
-}, { a: 0, b: 0, n: -1 });
-console.log("[%i, %i] produces the longest number of consecutive primes, at %i", longest.a, longest.b, longest.consecutive_primes );
