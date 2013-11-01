@@ -1,4 +1,4 @@
-/* globals console */
+/* globals console, BigInteger */
 function range(bound) {
 	return [].dim(bound).map(function(i, ix) { return ix + 1; });
 }
@@ -118,35 +118,20 @@ function string_int_add(str1, str2) {
 
 debugger;
 
-function quadratic(a, b) {
-	// var r_a = new BigInteger(a),
-		// r_b = new BigInteger(b);
-	return function(n) {
-		// var r_n = new BigInteger(n);
-		// return (r_n.pow(2)).add(r_a.multiply(n)).add(r_b);
-		return Math.pow(n, 2) + (n * a) + b;
+var results = [];
+for (var a = 2; a <= 100; a++) {
+	var v_a = new BigInteger([a],1);
+	for (var b = 2; b <= 100; b++) {
+		var v_b = new BigInteger([b],1);
+		results.push(v_a.pow(v_b).toString(10));
 	}
 }
-
-var pairs = [];
-for (var a = -999; a < 1000; a++) {
-	for (var b = -999; b < 1000; b++) {
-		pairs.push({
-			a: a,
-			b: b,
-			n: 0
-			// fn: quadratic(a, b)
-		});
+var spoilers = [];
+results = results.reduce(function(out, v, ix, array) {
+	var ixNext = array.indexOf(v, ix+1);
+	if (!~ixNext) {
+		out.push(v);
 	}
-}
-pairs.forEach(function(pair) {
-	var fn = quadratic(pair.a, pair.b);
-	var candidate = fn(pair.n);
-	while (candidate > 0 && candidate.valueOf().primeFactors().length === 0) {
-		candidate = fn(++pair.n);
-	}
-});
-var longest = pairs.reduce(function(out, pair) {
-	if (pair.n > out.n) return pair; else return out;
-}, { a: 0, b: 0, n: -1 });
-console.log("[%i, %i] produces the longest number of consecutive primes, at %i", longest.a, longest.b, longest.consecutive_primes );
+	return out;
+}, []);
+console.log("%i results", results.length);

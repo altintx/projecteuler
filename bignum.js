@@ -1187,6 +1187,9 @@ BigInteger.prototype.divRemSmall = function(n) {
 	}
 
 	var digits = this._d.slice();
+	if (typeof digits == "string") {
+		digits = digits.split("");
+	}
 	var quot = new Array(digits.length);
 	var part = 0;
 	var diff = 0;
