@@ -118,35 +118,115 @@ function string_int_add(str1, str2) {
 
 debugger;
 
-function quadratic(a, b) {
-	// var r_a = new BigInteger(a),
-		// r_b = new BigInteger(b);
-	return function(n) {
-		// var r_n = new BigInteger(n);
-		// return (r_n.pow(2)).add(r_a.multiply(n)).add(r_b);
-		return Math.pow(n, 2) + (n * a) + b;
+function generateSpiral(w, h) {
+	var grid = [];
+	var index = {};
+	var x = Math.ceil(w / 2),
+		y = Math.ceil(h / 2),
+		dir = "r"; // r d l u
+	var cornerSum = 0;
+	var move = function() {
+		isCorner = false;
+		switch(dir) {
+			case "r":
+				x++;
+				if ((y+1) <= h) {
+					if ( // can go down
+						(
+							!(
+								(y+1) in index
+							)
+						)
+						|| 
+						(
+							(y+1) in index
+							&&
+							!(x in index[y+1])
+						)
+					) {
+						dir = "d";
+					}
+				}
+				return "x";
+			case "d":
+				y++;
+				if (
+					(
+						(y in index)
+						&&
+						(x > 1)
+						&& 
+						(!((x - 1) in index[y]))
+					)
+					||
+					(
+						!(y in index)
+						&& x > 1
+					)
+				) {
+				// if (!(y in index) && !(x in index[y])) {
+					dir = "l";
+				}
+				return "y";
+			case "l":
+				x--;
+				if (
+					(y > 1)
+					&&
+					(!(x in index[y - 1]))
+				) {
+				// if (!(y in index) && !(x in index[y - 1])) {
+					dir = "u";
+				}
+				return "x";
+			case "u":
+				y--;
+				if (
+					((x + 1) < w) 
+					&&
+					(
+						(!(y in index))
+						||
+						(
+							(y in index) 
+							&&
+							!((x + 1) in index[y])
+						)
+					)
+				) {
+				// if (!((y - 1) in index)) {
+					dir = "r";
+				}
+				return "y";
+		}
+	};
+	for (var i = 1; i <= w * h; i++) {
+		// checky: while (y in index) {
+		// 	checkx: while (x in index[y]) {
+		// 		var b = move();
+		// 		if (b == "x") continue checkx;
+		// 		if (b == "y") continue checky;
+		// 	}
+		// 	break;
+		// }
+		// if (isCorner) cornerSum += i;
+		if (y == x) {
+			cornerSum += i;
+		} else if ((x + y) == w) {
+			cornerSum += i;
+		}
+		grid.push({
+			x: x,
+			y: y,
+			num: i
+		});
+		index[y] = index[y] || {};
+		index[y][x] = true;
+		move();
 	}
+	// cornerSum += (i - 1);
+	console.log("sum of corners %i", cornerSum);
+	return grid;
 }
 
-var pairs = [];
-for (var a = -999; a < 1000; a++) {
-	for (var b = -999; b < 1000; b++) {
-		pairs.push({
-			a: a,
-			b: b,
-			n: 0
-			// fn: quadratic(a, b)
-		});
-	}
-}
-pairs.forEach(function(pair) {
-	var fn = quadratic(pair.a, pair.b);
-	var candidate = fn(pair.n);
-	while (candidate > 0 && candidate.valueOf().primeFactors().length === 0) {
-		candidate = fn(++pair.n);
-	}
-});
-var longest = pairs.reduce(function(out, pair) {
-	if (pair.n > out.n) return pair; else return out;
-}, { a: 0, b: 0, n: -1 });
-console.log("[%i, %i] produces the longest number of consecutive primes, at %i", longest.a, longest.b, longest.consecutive_primes );
+var s = generateSpiral(1001,1001);
