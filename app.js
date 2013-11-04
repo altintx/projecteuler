@@ -118,33 +118,133 @@ function string_int_add(str1, str2) {
 
 debugger;
 
-var compositions = {
-	1:   [[1]],
-	2:   [[2], [1, 1]],
-	5:   [[5], [2, 2, 1]],
-	10:  [[10], [5, 5]],
-	20:  [[20], [10, 10]],
-	50:  [[50], [20, 20, 10]],
-	100: [[100], [50, 50]],
-	200: [[200], [100, 100]]
-};
+// var compositions = {
+// 	1:   [[1]],
+// 	2:   [[2], [1, 1]],
+// 	5:   [[5], [2, 2, 1]],
+// 	10:  [[10], [5, 5]],
+// 	20:  [[20], [10, 10]],
+// 	50:  [[50], [20, 20, 10]],
+// 	100: [[100], [50, 50]],
+// 	200: [[200], [100, 100]]
+// };
 
-var combinations = [];
+// var combinations = [];
 
-var walker = memoize(function(target) {
-	var combinations = [];
-	compositions[target].forEach(function(combo) {
-		combinations.push(combo);
-		if (combo.length > 1) {
-			combo.forEach(function(param, ix) {
-				combinations.push(
-					combo
-						.slice(0,ix)
-						.concat(combo.slice(ix+1,combo.length - (ix + 1)))
-			})
-		}
+// var walker = memoize(function(target) {
+// 	var combinations = [];
+// 	compositions[target].forEach(function(combo) {
+// 		combinations.push(combo);
+// 		if (combo.length > 1) {
+// 			combo.forEach(function(param, ix) {
+// 				combinations.push(
+// 					combo
+// 						.slice(0,ix)
+// 						.concat(combo.slice(ix+1,combo.length - (ix + 1)))
+// 			})
+// 		}
+// 	});
+// 	return combinations;
+// });
+// combinations = walker(200);
+// console.log(combinations);
+
+var combos = [];
+var target = 200;
+for (var cur1 = target; cur1 >= 0; cur1--) {
+	if (cur1 == 200) combos.push({
+		"1p": cur1,
+		"2p": 0,
+		"5p": 0,
+		"10p": 0,
+		"20p": 0,
+		"50p": 0,
+		"1l": 0,
+		"2l": 0
 	});
-	return combinations;
-});
-combinations = walker(200);
-console.log(combinations);
+	else for (var cur2 = 0; cur2 <= target - cur1; cur2+=2) {
+		if (cur1 + cur2 == 200) combos.push({
+		"1p": cur1,
+		"2p": cur2 / 2,
+		"5p": 0,
+		"10p": 0,
+		"20p": 0,
+		"50p": 0,
+		"1l": 0,
+		"2l": 0
+	});
+		else for (var cur3 = 0; cur3 <= target - (cur1 + cur2); cur3+=5) {
+			if (cur1 + cur2 + cur3 == 200) combos.push({
+				"1p": cur1,
+				"2p": cur2/2,
+				"5p": cur3/5,
+				"10p": 0,
+				"20p": 0,
+				"50p": 0,
+				"1l": 0,
+				"2l": 0
+			});
+			else for (var cur4 = 0; cur4 <= target - (cur1 + cur2 + cur3); cur4+=10) {
+				if (cur1 + cur2 + cur3 + cur4 == 200) combos.push({
+					"1p": cur1,
+					"2p": cur2/2,
+					"5p": cur3/5,
+					"10p": cur4/10,
+					"20p": 0,
+					"50p": 0,
+					"1l": 0,
+					"2l": 0
+				});
+				else for (var cur5 = 0; cur5 <= target - (cur1 + cur2 + cur3 + cur4); cur5 += 20) {
+					if (cur1 + cur2 + cur3 + cur4 + cur5 == 200) combos.push({
+						"1p": cur1,
+						"2p": cur2/2,
+						"5p": cur3/5,
+						"10p": cur4/10,
+						"20p": cur5/20,
+						"50p": 0,
+						"1l": 0,
+						"2l": 0
+					});
+					else for (var cur6 = 0; cur6 <= target - (cur1 + cur2 + cur3 + cur4 + cur5); cur6 += 50) {
+						if (cur1 + cur2 + cur3 + cur4 + cur5 + cur6 == 200) combos.push({
+							"1p": cur1,
+							"2p": cur2/2,
+							"5p": cur3/5,
+							"10p": cur4/10,
+							"20p": cur5/20,
+							"50p": cur6/50,
+							"1l": 0,
+							"2l": 0
+						});
+						else for (var cur7 = 0; cur7 <= target - (cur1 + cur2 + cur3 + cur4 + cur5 + cur6); cur7 += 100) {
+							if (cur1 + cur2 + cur3 + cur4 + cur5 + cur6 + cur7 == 200) combos.push({
+								"1p": cur1,
+								"2p": cur2/2,
+								"5p": cur3/5,
+								"10p": cur4/10,
+								"20p": cur5/20,
+								"50p": cur6/50,
+								"1l": cur7/100,
+								"2l": 0
+							});
+							else for (var cur8 = 0; cur8 <= target - (cur1 + cur2 + cur3 + cur4 + cur5 + cur6 + cur7); cur8 += 200) {
+								if (cur1 + cur2 + cur3 + cur4 + cur5 + cur6 + cur7 + cur8 == 200) combos.push({
+									"1p": cur1,
+									"2p": cur2/2,
+									"5p": cur3/5,
+									"10p": cur4/10,
+									"20p": cur5/20,
+									"50p": cur6/50,
+									"1l": cur7/100,
+									"2l": cur8/200
+								});
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+console.log("%i combos to make 200p, %o", combos.length, combos);
