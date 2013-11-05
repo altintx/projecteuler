@@ -118,35 +118,29 @@ function string_int_add(str1, str2) {
 
 debugger;
 
-function quadratic(a, b) {
-	// var r_a = new BigInteger(a),
-		// r_b = new BigInteger(b);
-	return function(n) {
-		// var r_n = new BigInteger(n);
-		// return (r_n.pow(2)).add(r_a.multiply(n)).add(r_b);
-		return Math.pow(n, 2) + (n * a) + b;
+
+var digits = [];
+var products = [];
+nextmultiplicand: for (var multiplicand = 4; multiplicand < 1000000000; multiplicand++) {
+	nextmultiple: for (var multiplier = Math.ceil(1000000000 / multiplicand); multiplier > 0; multiplier--) {
+		var product = multiplicand * multiplier;
+		var digits = multiplier.toString() + multiplicand.toString() + product.toString();
+		if (digits.length < 9) continue nextmultiplicand;
+		if (digits.length > 10) {
+			multiplier = Math.ceil(multiplier / 10);
+			continue nextmultiple;
+		} else if (digits.length == 10) {
+			continue nextmultiple;
+		}
+
+		for (var d = 0; d < digits.length; d++) {
+			if (~digits.indexOf(digits.substr(d,1), d+1)) {
+				continue nextmultiple;
+			}
+		}
+		if (~digits.indexOf("0")) continue nextmultiple;
+		if (products.indexOf(product.toString()) == -1) products.push(product.toString());
 	}
 }
 
-var pairs = [];
-for (var a = -999; a < 1000; a++) {
-	for (var b = -999; b < 1000; b++) {
-		pairs.push({
-			a: a,
-			b: b,
-			n: 0
-			// fn: quadratic(a, b)
-		});
-	}
-}
-pairs.forEach(function(pair) {
-	var fn = quadratic(pair.a, pair.b);
-	var candidate = fn(pair.n);
-	while (candidate > 0 && candidate.valueOf().primeFactors().length === 0) {
-		candidate = fn(++pair.n);
-	}
-});
-var longest = pairs.reduce(function(out, pair) {
-	if (pair.n > out.n) return pair; else return out;
-}, { a: 0, b: 0, n: -1 });
-console.log("[%i, %i] produces the longest number of consecutive primes, at %i", longest.a, longest.b, longest.consecutive_primes );
+console.log("sum of products : %i", Math.sum(products.map(function(p) { return parseInt(p, 10); })));
