@@ -1,4 +1,5 @@
 /* globals console */
+var BigInteger = require("./BigInteger.js").BigInteger;
 function range(bound) {
 	return [].dim(bound).map(function(i, ix) { return ix + 1; });
 }
@@ -19,7 +20,7 @@ function fibbonaci(sequence) {
 	);
 }
 Number.prototype.isFactor = function(v) {
-	return this % v === 0 && v > 1;
+	return this % v === 0 && v > 1 && v < this;
 };
 Number.prototype.factors = function() {
 	var out = [];
@@ -78,69 +79,69 @@ png.prototype.iterator = function() {
 
 function memoize(fn, scope) {
 	var cache = {};
-	scope = scope || window;
+	scope = scope || {};
 	return function() {
 		if (arguments[0] in cache) return cache[arguments[0]];
 		cache[arguments[0]] = fn.apply(scope, arguments);
 		return cache[arguments[0]];
 	};
 }
+function permutate(array, callback) {
+    // Do the actual permuation work on array[], starting at index
+    function p(array, index, callback) {
+      // Swap elements i1 and i2 in array a[]
+      function swap(a, i1, i2) {
+        var t = a[i1];
+        a[i1] = a[i2];
+        a[i2] = t;
+      }
 
-function string_int_add(str1, str2) {
-	var result = "";
-	var lsd = 1;
-	var msd = Math.max(str1.length, str2.length);
-	var carry = 0;
-	var temp = 0;
-	for (var ix = lsd; ix <= msd; ix++) {
-		if (ix <= str1.length && ix <= str2.length) {
-			temp = parseInt(str1.substr(str1.length - ix, 1), 10) + parseInt(str2.substr(str2.length - ix, 1), 10) + carry;
-		} else if (ix <= str1.length) {
-			temp = parseInt(str1.substr(str1.length - ix, 1), 10) + carry;
-		} else {
-			temp = parseInt(str2.substr(str2.length - ix, 1), 10) + carry;
-		}
-		
-		if (temp >= 10) {
-			carry = Math.floor(temp / 10);
-			temp = temp % 10;
-		} else {
-			carry = 0;
-		}
-		result = temp.toString() + result;
-	}
-	if (carry) {
-		return carry.toString() + result;
-	} else {
-		return result;
-	}
-}
+      if (index == array.length - 1) {
+        callback(array);
+        return 1;
+      } else {
+        var count = p(array, index + 1, callback);
+        for (var i = index + 1; i < array.length; i++) {
+          swap(array, i, index);
+          count += p(array, index + 1, callback);
+          swap(array, i, index);
+        }
+        return count;
+      }
+    }
 
+    if (!array || array.length == 0) {
+      return 0;
+    }
+    return p(array, 0, callback);
+  }
 debugger;
 
+var gen = new png();
+while (gen.iterator() < 1000000) {}
+delete gen.primes[gen.primes.length - 1];
+gen.candidates = [2];
 
-var digits = [];
-var products = [];
-nextmultiplicand: for (var multiplicand = 4; multiplicand < 1000000000; multiplicand++) {
-	nextmultiple: for (var multiplier = Math.ceil(1000000000 / multiplicand); multiplier > 0; multiplier--) {
-		var product = multiplicand * multiplier;
-		var digits = multiplier.toString() + multiplicand.toString() + product.toString();
-		if (digits.length < 9) continue nextmultiplicand;
-		if (digits.length > 10) {
-			multiplier = Math.ceil(multiplier / 10);
-			continue nextmultiple;
-		} else if (digits.length == 10) {
-			continue nextmultiple;
-		}
-
-		for (var d = 0; d < digits.length; d++) {
-			if (~digits.indexOf(digits.substr(d,1), d+1)) {
-				continue nextmultiple;
-			}
-		}
-		if (~digits.indexOf("0")) continue nextmultiple;
-		if (products.indexOf(product.toString()) == -1) products.push(product.toString());
+function rotate(number, callback) {
+	var s = number.toString();
+	for (var i = 0; i < s.length; i++) {
+		callback(s.substr(i, s.length - i) + s.substr(0, i));
 	}
 }
 
-console.log("sum of products : %i", Math.sum(products.map(function(p) { return parseInt(p, 10); })));
+var circular_primes = [2];
+gen.primes.forEach(function(p) {
+	var isCirc = true;
+	if (/[02468]/.test(p.toString())) return;
+	if (p == 1193) debugger;
+
+	rotate(p, function(rotation) {
+		gen.index = parseInt(rotation, 10);
+		isCirc = isCirc && gen.isPrime();
+	});
+	if (isCirc) {
+		circular_primes.push(p);
+	}
+});
+
+console.log(circular_primes.length);
