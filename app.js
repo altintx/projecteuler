@@ -116,31 +116,18 @@ function string_int_add(str1, str2) {
 	}
 }
 
-debugger;
-
-
-var digits = [];
-var products = [];
-nextmultiplicand: for (var multiplicand = 4; multiplicand < 1000000000; multiplicand++) {
-	nextmultiple: for (var multiplier = Math.ceil(1000000000 / multiplicand); multiplier > 0; multiplier--) {
-		var product = multiplicand * multiplier;
-		var digits = multiplier.toString() + multiplicand.toString() + product.toString();
-		if (digits.length < 9) continue nextmultiplicand;
-		if (digits.length > 10) {
-			multiplier = Math.ceil(multiplier / 10);
-			continue nextmultiple;
-		} else if (digits.length == 10) {
-			continue nextmultiple;
-		}
-
-		for (var d = 0; d < digits.length; d++) {
-			if (~digits.indexOf(digits.substr(d,1), d+1)) {
-				continue nextmultiple;
-			}
-		}
-		if (~digits.indexOf("0")) continue nextmultiple;
-		if (products.indexOf(product.toString()) == -1) products.push(product.toString());
-	}
+String.prototype.isPalindrome = function() {
+	var l = Math.floor(this.length / 2);
+	return (this.substr(0, l)) == (this.substr(-l, l).split("").reverse().join(""));
 }
 
-console.log("sum of products : %i", Math.sum(products.map(function(p) { return parseInt(p, 10); })));
+debugger;
+
+var BigInteger = require("./BigInteger").BigInteger;
+
+var sum = BigInteger.ZERO;
+
+for (var i = 1; i < 1000000; i++) {
+	if (i.toString().isPalindrome() && i.toString(2).isPalindrome()) sum = sum.add(i);
+}
+console.log (sum.toString(10));
